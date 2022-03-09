@@ -12,6 +12,7 @@ const app = express();
 // This url indicates which chain you want to connect to
 //const rpcUrl = "https://rinkeby-light.eth.linkpool.io/"; //rinkeby (ethereum test net)
 const rpcUrl = "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"; //rinkeby (ethereum test net)
+//const rpcUrl = "https://matic-mumbai.chainstacklabs.com"; //polygon mumbai
 // You can switch out this provider with any wallet or provider setup you like.
 //const provider = ethers.Wallet.createRandom(); //from code sample in thirdweb
 const provider = ethers.getDefaultProvider(rpcUrl);
@@ -25,11 +26,8 @@ const sdk = new ThirdwebSDK(
 );
 
 // Instantiate Token module
-const token = sdk.getTokenModule("0xc33A4EBa66A3a3Cf84F898f2398966Bf6A2e37a3");
-// Address of the wallet who owns the funds
-const ownerAddress = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
-const pubkeyImo = "0x91a0e24ABABd871a4c06ef876B3a12B1A717FE8f";
-const pubkeyThomas = "0x82A820016E3dE2b0c1e259B4aBB275c0E8f8E33F";
+const token = sdk.getTokenModule("0x4cAA8c43D87EF8fd05B941a139efE55097E8aEf7");
+
 
 async function getBalance(balanceAddress) {
   const balance = await token.balanceOf(balanceAddress);

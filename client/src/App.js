@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import moztoken from "./moztoken.jpg"; // gives image path
 
 function App() {
   const [connected, setConnected] = React.useState(null);
@@ -21,7 +22,7 @@ function App() {
   }
 
   async function mintTo() {
-    if (publicKey != "") {
+    if (publicKey !== "") {
       setIsMinting(true);
       const mintAddress = publicKey;
       fetch(`/mint_to/${mintAddress}`)
@@ -30,6 +31,7 @@ function App() {
           setIsMinting(false);
           if (data.message === "success") {
             getBalance();
+            setError("");
           } else if (data.message === "error") {
             setError(
               "Error minting. It's possible the minter may not have sufficient ETH to pay the gas, or your public key is incorrect"
@@ -50,26 +52,40 @@ function App() {
       <header className="App-header">
         {connected ? (
           <div className="App-loaded-container">
+            <div className="App-logo-container">
+              <img className="App-logo" src={moztoken} alt="MozToken Logo" />
+            </div>
             <div className="App-input-container">
               <label htmlFor="publicKey">Enter your public key:</label>
-              <br />
-              <input
-                type="text"
-                id="publicKey"
-                value={publicKey}
-                onChange={handlePublicKeyChange}
-              />
+              <p>
+                <input
+                  type="text"
+                  className="App-pk-inpu3"
+                  id="publicKey"
+                  value={publicKey}
+                  onChange={handlePublicKeyChange}
+                  placeholder="0x000..."
+                />
+              </p>
             </div>
 
             <div className="App-button-container">
               {!isMinting ? (
-                <button onClick={mintTo}>Mint Some MOZ</button>
+                <button className="App-mint-button" onClick={mintTo}>
+                  Gimme Some MOZ
+                </button>
               ) : (
-                <button>Minting in progress...</button>
+                <button className="App-mint-button">
+                  Minting in progress...
+                </button>
               )}
             </div>
             <div className="App-output-container">
-              {balance && <p>Balance: {balance}</p>}
+              {balance && (
+                <p>
+                  <span className="bold">Your Balance:</span> {balance} MOZ
+                </p>
+              )}
               {error && <p>Error: {error}</p>}
             </div>
           </div>
