@@ -2,49 +2,80 @@ import React from "react";
 import "./App.css";
 
 function App() {
-  const [data, setData] = React.useState(null);
   const [connected, setConnected] = React.useState(null);
   const [balance, setBalance] = React.useState(null);
-
-  const ownerAddress = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199";
+  const [publicKey, setPublicKey] = React.useState("");
+  const [isMinting, setIsMinting] = React.useState(false);
+  const [error, setError] = React.useState(null);
 
   React.useEffect(() => {
-    fetch("/api")
+    fetch("/connect")
       .then((res) => res.json())
-      .then((data) => setData(data.message));
+      .then((data) => setConnected(data.message));
   }, []);
 
   async function getBalance() {
-    fetch(`/get_balance/${ownerAddress}`)
+    fetch(`/get_balance/${publicKey}`)
       .then((res) => res.json())
       .then((data) => setBalance(data.balance));
   }
 
-  async function transferBalance() {
-    const transferAddress = "0x82A820016E3dE2b0c1e259B4aBB275c0E8f8E33F"; //THOMAS
-    fetch(`/transfer_balance/${transferAddress}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-      });
+  async function mintTo() {
+    if (publicKey != "") {
+      setIsMinting(true);
+      const mintAddress = publicKey;
+      fetch(`/mint_to/${mintAddress}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setIsMinting(false);
+          if (data.message === "success") {
+            getBalance();
+          } else if (data.message === "error") {
+            setError(
+              "Error minting. It's possible the minter may not have sufficient ETH to pay the gas, or your public key is incorrect"
+            );
+          }
+        });
+    } else {
+      setError("you must enter a public key");
+    }
   }
 
-  async function mintTo() {
-    const transferAddress = "0x82A820016E3dE2b0c1e259B4aBB275c0E8f8E33F"; //THOMAS
-    fetch(`/mint_to/${transferAddress}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-      });
-  }
+  const handlePublicKeyChange = (e) => {
+    setPublicKey(e.target.value);
+  };
 
   return (
     <div className="App">
       <header className="App-header">
-        <p>{!data ? "Loading..." : data}</p>
-        <button onClick={getBalance}>getBalance</button>
-        <p>{!balance ? "" : `Balance: ${balance}`}</p>
-        <button onClick={mintTo}>mintTo</button>
+        {connected ? (
+          <div className="App-loaded-container">
+            <div className="App-input-container">
+              <label htmlFor="publicKey">Enter your public key:</label>
+              <br />
+              <input
+                type="text"
+                id="publicKey"
+                value={publicKey}
+                onChange={handlePublicKeyChange}
+              />
+            </div>
+
+            <div className="App-button-container">
+              {!isMinting ? (
+                <button onClick={mintTo}>Mint Some MOZ</button>
+              ) : (
+                <button>Minting in progress...</button>
+              )}
+            </div>
+            <div className="App-output-container">
+              {balance && <p>Balance: {balance}</p>}
+              {error && <p>Error: {error}</p>}
+            </div>
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )}
       </header>
     </div>
   );
